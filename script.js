@@ -1,9 +1,10 @@
 const gameBoard = (() => {
     let theBoard = ['', '', '', '', '', '', '', '', ''];
-    const insertX = (x) => theBoard[x] = "X";
-    const insertO = (o) => theBoard[o] = "O";
+    const insertX = (x) => gameBoard.theBoard[x] = "X";
+    const insertO = (o) => gameBoard.theBoard[o] = "O";
 
     const checkWinOrGameOver = () => {
+        theBoard = gameBoard.theBoard;
         // Top Row
         if (theBoard[0] == theBoard[1] && theBoard[1] == theBoard[2] && theBoard[0] != '') {
             return theBoard[0];
@@ -52,13 +53,27 @@ const gameBoard = (() => {
 
         return 'Tie';
 
-    };
+    }
+
+    const isOver = () => {
+        let result = checkWinOrGameOver();
+        if (result == 'X' || result == 'O' || result == 'Tie') {
+            return true;
+        }
+        return false;
+    }
+
+    const restart = () => {
+        gameBoard.theBoard = ['', '', '', '', '', '', '', '', ''];
+    }
 
     return {
         theBoard,
         insertX,
         insertO,
         checkWinOrGameOver,
+        isOver,
+        restart,
     };
 })();
 
@@ -91,11 +106,17 @@ const displayController = (() => {
             newDiv.style.lineHeight = 500 / 3 + 'px';
             newDiv.style.backgroundColor = 'white';
             newDiv.dataset.index = i;
-            newDiv.addEventListener('click', () => {
-                player.takeMove(newDiv.dataset.index)
-                game.isOver(player.num);
+            if (gameBoard.theBoard[i] == 'X' || gameBoard.theBoard[i] == 'O' || gameBoard.isOver()) {
+                
+            } else {
+                newDiv.addEventListener('click', () => {
+                    player.takeMove(newDiv.dataset.index)
+                    game.isOver(player.num);
+                    
+                    
 
-            });  
+                });
+            }
             parent.appendChild(newDiv);
         }
     }
@@ -148,34 +169,45 @@ const game = (() => {
 
     const isOver = (num) => {
         let gameOver = gameBoard.checkWinOrGameOver();
-        if (gameOver == 'X') {
-            console.log('Player 1 Wins!');
-        }
-    
-        if (gameOver == 'O') {
-            console.log('Player 2 Wins!');
-        }
-    
-        if (gameOver == 'Tie') {
-            console.log('Tie!');
-        }
-
-        if (num == 1) {
-            
-            displayController.displayBoard(player2);
-            
-        } else {
+        if (gameBoard.isOver()) {
             displayController.displayBoard(player1);
+            const winner = document.querySelector('#winner');
+            if (gameOver == 'X') {
+                winner.textContent = 'Player 1 Wins!';
+            }
+        
+            if (gameOver == 'O') {
+                winner.textContent = 'Player 2 Wins!';
+            }
+        
+            if (gameOver == 'Tie') {
+                winner.textContent = 'Tie!';
+            }
+        } else {
+        
+            if (num == 1) {
+                displayController.displayBoard(player2);
+                
+            } else {
+                displayController.displayBoard(player1);
+            }
         }
     }
     
+
     return {
         isOver,
-    }
+    };
 })();
 
 let player1 = Player(1);
 let player2 = Player(2);
 player1.sayName();
 player2.sayName();
-displayController.displayBoard(player1);
+const button = document.querySelector('#start-restart');
+button.addEventListener('click', () => {
+    button.textContent = 'Restart';
+    gameBoard.restart();
+    displayController.displayBoard(player1);
+});
+
