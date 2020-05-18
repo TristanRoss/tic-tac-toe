@@ -1,8 +1,30 @@
 html {
-    background-color: black;
+    background-color: rgb(192, 164, 88);
     color: white;
+    font-family: 'Roboto', sans-serif;
 }
 
 #container {
     margin: 20px;
+}
+
+#wrapper {
+    width: 50%;
+    margin: auto;
+    margin-top: 40px;
+    height: 525px;
+    text-align: center;
+    background-color: black;
+}
+
+button {
+    margin: 20px;
+    width: 100px;
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color: white;
+}
+
+button:hover {
+    background-color: rgb(158, 158, 158);
 }

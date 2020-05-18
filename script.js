@@ -88,11 +88,14 @@ const displayController = (() => {
             str += 'auto ';
         }
         
+        parent.style.width = '50%';
+        parent.style.margin = 'auto';
+        parent.style.paddingTop = '30px';
         parent.style.display = 'grid';
         parent.style.gridTemplateColumns = str;
         parent.style.gridGap = '0';
-        parent.style.width = '506px';
-        parent.style.height = '506px';
+        parent.style.width = '306px';
+        parent.style.height = '306px';
         
         for (let i = 0; i < 9; i++) {
             const newDiv = document.createElement('div');
@@ -100,10 +103,10 @@ const displayController = (() => {
             newDiv.style.border = '1px solid black';
             newDiv.style.color = 'black';
             newDiv.style.textAlign = 'center';
-            newDiv.style.width = 500 / 3 + 'px';
-            newDiv.style.height = 500 /3 + 'px';
+            newDiv.style.width = 300 / 3 + 'px';
+            newDiv.style.height = 300 /3 + 'px';
             newDiv.style.fontSize = '50px';
-            newDiv.style.lineHeight = 500 / 3 + 'px';
+            newDiv.style.lineHeight = 300 / 3 + 'px';
             newDiv.style.backgroundColor = 'white';
             newDiv.dataset.index = i;
             if (gameBoard.theBoard[i] == 'X' || gameBoard.theBoard[i] == 'O' || gameBoard.isOver()) {
@@ -111,7 +114,7 @@ const displayController = (() => {
             } else {
                 newDiv.addEventListener('click', () => {
                     player.takeMove(newDiv.dataset.index)
-                    game.isOver(player.num);
+                    game.isOver(player.number);
                     
                     
 
@@ -129,23 +132,39 @@ const displayController = (() => {
     const displayName = (name, number) => {
         const div = document.createElement('div');
         div.textContent = `Player ${number}: ${name}`;
+        div.style.fontSize = '20px';
         const names = document.querySelector('#names');
         names.appendChild(div);
+    }
+
+    const removeNames = () => {
+        const names = document.querySelector('#names');
+        while (names.firstChild) {
+            names.removeChild(names.firstChild);
+        }
+    }
+
+    const removeWinnerText = () => {
+        const winner = document.querySelector('#winner');
+        winner.textContent = '';
     }
 
     return {
         displayBoard,
         promptName,
         displayName,
+        removeNames,
+        removeWinnerText,
     }
 
 })();
 
-const Player = (number) => {
-    let num = number;
+const Player = (number, name) => {
     const sayName = () => {
-        displayController.displayName(displayController.promptName(number), number);
+        displayController.displayName(name, number);
     }
+
+    const getName = () => name;
 
     const takeMove = (slot) => {
         if (number == 1) {
@@ -160,7 +179,8 @@ const Player = (number) => {
     return {
         sayName,
         takeMove,
-        num,
+        getName,
+        number,
     };
 }
 
@@ -173,11 +193,11 @@ const game = (() => {
             displayController.displayBoard(player1);
             const winner = document.querySelector('#winner');
             if (gameOver == 'X') {
-                winner.textContent = 'Player 1 Wins!';
+                winner.textContent = `${player1.getName()} Wins!`;
             }
         
             if (gameOver == 'O') {
-                winner.textContent = 'Player 2 Wins!';
+                winner.textContent = `${player2.getName()} Wins!`;
             }
         
             if (gameOver == 'Tie') {
@@ -200,13 +220,18 @@ const game = (() => {
     };
 })();
 
-let player1 = Player(1);
-let player2 = Player(2);
-player1.sayName();
-player2.sayName();
+let player1;
+let player2;
+
 const button = document.querySelector('#start-restart');
 button.addEventListener('click', () => {
+    displayController.removeNames();
+    displayController.removeWinnerText();
     button.textContent = 'Restart';
+    player1 = Player(1, displayController.promptName(1));
+    player2 = Player(2, displayController.promptName(2));
+    player1.sayName();
+    player2.sayName();
     gameBoard.restart();
     displayController.displayBoard(player1);
 });
